@@ -1,0 +1,57 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Representa o Colaborador/Autor.
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  articles  Article[]
+  comments  Comment[]
+}
+
+model Article {
+  id           Int      @id @default(autoincrement())
+  title        String
+  content      String
+  authorId     Int
+  author       User     @relation(fields: [authorId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  tags         ArticleOnTag[]
+  comments     Comment[]
+}
+
+model Tag {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  articles     ArticleOnTag[]
+}
+
+model ArticleOnTag {
+  article      Article @relation(fields: [articleId], references: [id])
+  articleId    Int
+  tag          Tag     @relation(fields: [tagId], references: [id])
+  tagId        Int
+  
+  @@id([articleId, tagId])
+}
+
+model Comment {
+  id          Int      @id @default(autoincrement())
+  content     String
+  createdAt   DateTime @default(now())
+  
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  
+  articleId   Int
+  article     Article  @relation(fields: [articleId], references: [id])
+}
