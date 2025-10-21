@@ -19,7 +19,12 @@ export class ArticleController {
       const tag = req.query.tag as string | undefined;
 
       // Chama o Service (Regra de Negocio)
-      const result = await this.articleService.getArticles({ page, pageSize, search, tag });
+      const result = await this.articleService.getArticles({
+        page,
+        pageSize,
+        search,
+        tag,
+      });
 
       return res.status(200).json(result);
     } catch (error) {

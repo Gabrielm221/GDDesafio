@@ -3,6 +3,6 @@ import { CommentCreateInput, CommentWithAuthor } from '../repository/CommentRepo
 
 // Contrato para o nosso Repositorio de Comentários (O Service dependerá desta Interface)
 export interface ICommentRepository {
-    create(data: CommentCreateInput): Promise<Comment>;
-    findByArticleId(articleId: number): Promise<CommentWithAuthor[]>;
+  create(data: CommentCreateInput): Promise<Comment>;
+  findByArticleId(articleId: number): Promise<CommentWithAuthor[]>;
 }
