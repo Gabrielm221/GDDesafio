@@ -6,6 +6,19 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    
+    // Configuracoes de Alias (Paths)
+    "baseUrl": "./src", 
+    "paths": {
+      "@src/*": ["*"] 
+    }
+  },
+  // =======================================================
+  "include": [
+    "src/**/*",
+    "tests/**/*"
+  ]
+  // =======================================================
 }
