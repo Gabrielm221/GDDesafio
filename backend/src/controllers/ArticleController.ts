@@ -1,35 +1,45 @@
 import { Request, Response } from 'express';
 import { ArticleService } from '../services/ArticleService';
 
-// Classe que lida com HTTP (SRP)
 export class ArticleController {
-  private articleService: ArticleService;
+  constructor(private articleService: ArticleService) {}
 
-  constructor(articleService: ArticleService) {
-    this.articleService = articleService;
-  }
-
-  // GET /api/articles?page=...&search=...
-  public async getArticles(req: Request, res: Response): Promise<Response> {
+  public async getArticles(req: Request, res: Response) {
     try {
-      // O Controller extrai e converte os parametros da requisicao
       const page = req.query.page ? parseInt(req.query.page as string) : undefined;
       const pageSize = req.query.pageSize ? parseInt(req.query.pageSize as string) : undefined;
       const search = req.query.search as string | undefined;
       const tag = req.query.tag as string | undefined;
 
-      // Chama o Service (Regra de Negocio)
-      const result = await this.articleService.getArticles({
-        page,
-        pageSize,
-        search,
-        tag,
-      });
-
+      const result = await this.articleService.getArticles({ page, pageSize, search, tag });
       return res.status(200).json(result);
-    } catch (error) {
-      console.error('Erro ao buscar artigos:', error);
-      return res.status(500).json({ message: 'Erro interno do servidor.' });
-    }
+    } catch (err) { return res.status(500).json({ message: 'Erro interno do servidor.' }); }
+  }
+
+  public async getArticleById(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const article = await this.articleService.getArticleById(id);
+      if (!article) return res.status(404).json({ message: 'Artigo não encontrado.' });
+      return res.status(200).json(article);
+    } catch (err) { return res.status(500).json({ message: 'Erro interno do servidor.' }); }
+  }
+
+  public async createArticle(req: Request, res: Response) {
+    try {
+      const { title, content, authorId, tags } = req.body;
+      const article = await this.articleService.createArticle({ title, content, authorId, tags });
+      return res.status(201).json(article);
+    } catch (err: any) { return res.status(400).json({ message: err.message }); }
+  }
+
+  public async updateArticle(req: Request, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+      const { title, content, tags } = req.body;
+      const updated = await this.articleService.updateArticle(id, { title, content, tags });
+      if (!updated) return res.status(404).json({ message: 'Artigo não encontrado para atualização.' });
+      return res.status(200).json(updated);
+    } catch (err) { return res.status(500).json({ message: 'Erro interno do servidor.' }); }
   }
 }

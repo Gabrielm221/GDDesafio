@@ -13,10 +13,12 @@
     "format": "prettier --write 'src/**/*.{ts,js,json}'",
     "format:check": "prettier --check 'src/**/*.{ts,js,json}'",
     "test:unit": "jest -c jest.config.unit.mjs",
-    "test:functional": "jest" 
+    "test:functional": "jest"
   },
   "dependencies": {
     "@prisma/client": "^6.17.1",
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.5",
     "express": "^4.18.2"
   },
   "devDependencies": {
