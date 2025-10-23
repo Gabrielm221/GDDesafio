@@ -8,18 +8,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Representa o Colaborador/Autor.
+// Representa o Autor/Usuário.
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  articles  Article[]
-  comments  Comment[]
+  id                Int      @id @default(autoincrement())
+  name              String   @unique
+  email             String   @unique
+  password          String
+  status            Boolean  @default(true)
+  profilePictureUrl String?
+  articles          Article[]
+  comments          Comment[]
 }
 
 model Article {
   id           Int      @id @default(autoincrement())
   title        String
   content      String
+  
+  imageUrl     String?  
+  
   authorId     Int
   author       User     @relation(fields: [authorId], references: [id])
   createdAt    DateTime @default(now())
@@ -30,28 +37,35 @@ model Article {
 }
 
 model Tag {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique
-  articles     ArticleOnTag[]
+  id            Int            @id @default(autoincrement())
+  name          String         @unique
+  articles      ArticleOnTag[]
 }
 
 model ArticleOnTag {
-  article      Article @relation(fields: [articleId], references: [id])
-  articleId    Int
-  tag          Tag     @relation(fields: [tagId], references: [id])
-  tagId        Int
+  article       Article @relation(fields: [articleId], references: [id])
+  articleId     Int
+  tag           Tag     @relation(fields: [tagId], references: [id])
+  tagId         Int
   
   @@id([articleId, tagId])
 }
 
 model Comment {
-  id          Int      @id @default(autoincrement())
-  content     String
-  createdAt   DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  content         String
+  createdAt       DateTime @default(now())
   
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
+  // Chave estrangeira para o comentário pai (torna o comentário filho)
+  parentId        Int?
+  parent          Comment? @relation("CommentReplies", fields: [parentId], references: [id])
   
-  articleId   Int
-  article     Article  @relation(fields: [articleId], references: [id])
+  // Relação que define as respostas (filhos)
+  replies         Comment[] @relation("CommentReplies") 
+
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+  
+  articleId       Int
+  article         Article  @relation(fields: [articleId], references: [id])
 }

@@ -1,0 +1,27 @@
+# Etapa 1: Build
+FROM node:22 AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+# Etapa 2: Servir com http-server
+FROM node:22-slim
+
+WORKDIR /app
+
+# Instala o servidor HTTP simples
+RUN npm install -g http-server
+
+# Copia a pasta dist do build
+COPY --from=builder /app/dist /app/dist
+
+# Exponha a porta
+EXPOSE 5180
+
+# Comando para servir a pasta dist
+CMD ["http-server", "dist", "-p", "5000"]

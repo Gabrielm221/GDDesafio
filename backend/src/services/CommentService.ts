@@ -1,30 +1,29 @@
-// src/services/CommentService.ts
 import { Comment } from '@prisma/client';
-import { CommentWithAuthor } from '../repository/CommentRepository';
+import { CommentWithAuthorAndReplies } from '../repository/CommentRepository';
 import { ICommentRepository } from '../types/CommentInterface';
 
-// Classe de Negocio (SRP)
 export class CommentService {
   private repository: ICommentRepository;
-  // ID padrao para o MVP (simula o usuário logado, inicialmente nao temos usuario)
-  private readonly DEFAULT_USER_ID = 1;
 
   constructor(repository: ICommentRepository) {
     this.repository = repository;
   }
 
-  public async addComment(articleId: number, content: string): Promise<Comment> {
-    // Regra de Negocio: Aplica o ID de usuario padrão
+  public async addComment(articleId: number, content: string, userId: number, parentId?: number): Promise<Comment> {
+    
+    // O Repositório é chamado para criar o registro (espera-se o tipo Comment base)
     const createdComment = await this.repository.create({
       articleId: articleId,
       content: content,
-      userId: this.DEFAULT_USER_ID,
+      userId: userId,
+      parentId: parentId,
     });
 
-    return createdComment;
+    // Retorna o tipo base Comment (o TS não deve reclamar se o Repositório estiver certo)
+    return createdComment; 
   }
 
-  public async getCommentsByArticle(articleId: number): Promise<CommentWithAuthor[]> {
+  public async getCommentsByArticle(articleId: number): Promise<CommentWithAuthorAndReplies[]> {
     return this.repository.findByArticleId(articleId);
   }
 }

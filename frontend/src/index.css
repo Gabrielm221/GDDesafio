@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@import "tailwindcss";
+
+
+:root {
+--primary: #6B9042;
+--secondary: #6B9042;
+--textPrimary: #232524;
+--textSecondary: #616161;
+--white: #FFFFFF;
+--accent: #6B9042;
+}
+
+
+@layer utilities {
+.bg-primary {
+background-color: var(--primary);
+}
+.bg-secondary {
+background-color: var(--secondary);
+}
+.bg-white {
+background-color: var(--white);
+}
+.bg-black {
+color: var(--textPrimary);
+}
+.text-textPrimary {
+color: var(--textPrimary);
+}
+.text-textSecondary {
+color: var(--textSecondary);
+}
+.text-textYellow {
+color: var(--primary);
+}
+.text-yellowSecondary {
+color: var(--primary);
+}
+
+
+.hover\:bg-accent:hover {
+background-color: var(--accent);
+}
+}
+
+
+/* pequenos ajustes visuais usados nos componentes */
+body { background: #fafaf6; }
+
+
+.container { max-width: 1100px; margin: 0 auto; }
+
+
+/* card placeholder image */
+.img-placeholder { width: 56px; height: 56px; border-radius: 10px; background: linear-gradient(135deg,#f2efe9,#e3dfd5);}

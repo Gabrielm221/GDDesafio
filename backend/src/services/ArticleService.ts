@@ -25,7 +25,10 @@ export class ArticleService {
       tag: params.tag?.trim(),
     });
 
-    return { data: articles, meta: { totalItems: total, pageSize, currentPage: page, totalPages: Math.ceil(total / pageSize) } };
+    return {
+      data: articles,
+      meta: { totalItems: total, pageSize, currentPage: page, totalPages: Math.ceil(total / pageSize) },
+    };
   }
 
   public async getArticleById(id: number): Promise<ArticleWithAuthorAndTags | null> {
@@ -37,16 +40,23 @@ export class ArticleService {
     content: string;
     authorId: number;
     tags?: string[];
+    imageUrl?: string;
   }): Promise<ArticleWithAuthorAndTags> {
-    if (!data.title || !data.content || !data.authorId) throw new Error('Título, conteúdo e authorId são obrigatórios');
+    if (!data.title || !data.content || !data.authorId)
+      throw new Error('Título, conteúdo e authorId são obrigatórios');
     return this.repository.createArticle(data);
   }
 
-  public async updateArticle(id: number, data: {
-    title?: string;
-    content?: string;
-    tags?: string[];
-  }): Promise<ArticleWithAuthorAndTags | null> {
+  public async updateArticle(
+    id: number,
+    data: { title?: string; content?: string; tags?: string[]; imageUrl?: string }
+  ): Promise<ArticleWithAuthorAndTags | null> {
+    if (!data.title && !data.content && !data.tags && !data.imageUrl)
+      throw new Error('Pelo menos um campo deve ser fornecido para atualização.');
+
+    if (data.title && data.title.trim().length === 0)
+      throw new Error('Título não pode ser vazio.');
+
     return this.repository.updateArticle(id, data);
   }
 }

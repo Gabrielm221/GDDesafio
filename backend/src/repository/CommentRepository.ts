@@ -1,21 +1,21 @@
 import { PrismaClient, Comment, Prisma } from '@prisma/client';
-import { ICommentRepository } from '../types/CommentInterface';
+import { ICommentRepository } from '../types/CommentInterface'; 
 
-export type CommentCreateInput = Omit<Prisma.CommentCreateInput, 'user' | 'article'> & {
+export type CommentCreateInput = Omit<Prisma.CommentCreateInput, 'user' | 'article' | 'parent' | 'replies'> & {
   userId: number;
   articleId: number;
+  parentId?: number; 
 };
-export type CommentWithAuthor = Prisma.CommentGetPayload<{
-  include: { user: { select: { name: true } } };
+export type CommentWithAuthorAndReplies = Prisma.CommentGetPayload<{
+  include: { 
+    user: { select: { id: true, name: true } },
+    replies: { include: { user: { select: { id: true, name: true } } } }
+  };
 }>;
 
-// Implementa o Contrato (OCP/DIP)
-export class CommentRepository implements ICommentRepository {
-  private prisma: PrismaClient;
 
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
-  }
+export class CommentRepository implements ICommentRepository {
+  constructor(private prisma: PrismaClient) {}
 
   public async create(data: CommentCreateInput): Promise<Comment> {
     return this.prisma.comment.create({
@@ -23,14 +23,26 @@ export class CommentRepository implements ICommentRepository {
         content: data.content,
         userId: data.userId,
         articleId: data.articleId,
+        parentId: data.parentId, 
       },
+      // 
     });
   }
 
-  public async findByArticleId(articleId: number): Promise<CommentWithAuthor[]> {
+  public async findByArticleId(articleId: number): Promise<CommentWithAuthorAndReplies[]> {
     return this.prisma.comment.findMany({
-      where: { articleId },
-      include: { user: { select: { name: true } } },
+      where: { 
+        articleId,
+        parentId: null, // Busca apenas comentários pais
+      },
+      
+      include: { 
+        user: { select: { id: true, name: true } }, 
+        replies: { 
+            include: { user: { select: { id: true, name: true } } },
+            orderBy: { createdAt: 'asc' }
+        }
+      },
       orderBy: { createdAt: 'asc' },
     });
   }

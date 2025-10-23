@@ -8,21 +8,22 @@ export interface IArticleRepository {
     tag?: string;
   }): Promise<{ articles: ArticleWithAuthorAndTags[]; total: number }>;
 
-  // NOVO: busca artigo por ID
   findById(id: number): Promise<ArticleWithAuthorAndTags | null>;
 
-  // NOVO: cria artigo
   createArticle(data: {
     title: string;
     content: string;
+    imageUrl?: string; // NOVO
     authorId: number;
     tags?: string[];
+    
   }): Promise<ArticleWithAuthorAndTags>;
 
-  // NOVO: atualiza artigo
+
   updateArticle(id: number, data: {
     title?: string;
     content?: string;
+    imageUrl?: string; // NOVO
     tags?: string[];
   }): Promise<ArticleWithAuthorAndTags | null>;
 }
