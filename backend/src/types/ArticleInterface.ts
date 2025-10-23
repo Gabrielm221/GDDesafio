@@ -16,14 +16,15 @@ export interface IArticleRepository {
     imageUrl?: string; // NOVO
     authorId: number;
     tags?: string[];
-    
   }): Promise<ArticleWithAuthorAndTags>;
 
-
-  updateArticle(id: number, data: {
-    title?: string;
-    content?: string;
-    imageUrl?: string; // NOVO
-    tags?: string[];
-  }): Promise<ArticleWithAuthorAndTags | null>;
+  updateArticle(
+    id: number,
+    data: {
+      title?: string;
+      content?: string;
+      imageUrl?: string; // NOVO
+      tags?: string[];
+    }
+  ): Promise<ArticleWithAuthorAndTags | null>;
 }

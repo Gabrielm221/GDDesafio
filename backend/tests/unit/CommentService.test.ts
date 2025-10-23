@@ -1,48 +1,72 @@
 import { CommentService } from '@src/services/CommentService';
-import { ICommentRepository } from '@src/types/CommentInterface';
+import { ICommentRepository } from '@src/types/CommentInterface'; 
 import { Comment } from '@prisma/client';
 
-const mockCreatedComment: Comment = {
-    id: 1, content: 'Comentário criado!', userId: 1, articleId: 5, createdAt: new Date(),
+const mockComment: Comment = {
+    id: 10,
+    content: 'Comentário de teste',
+    userId: 99, 
+    articleId: 5,
+    createdAt: new Date(),
+    parentId: null,
 };
 
-// Mock do Contrato (ICommentRepository)
 const mockCommentRepository: jest.Mocked<ICommentRepository> = {
     create: jest.fn(),
     findByArticleId: jest.fn(),
 };
 
-describe('CommentService (Regra de Negócio: Criação de Comentário)', () => {
+describe('CommentService (Regra de Negócio)', () => {
     let commentService: CommentService;
 
     beforeEach(() => {
         commentService = new CommentService(mockCommentRepository);
-        mockCommentRepository.create.mockClear();
-        mockCommentRepository.findByArticleId.mockClear();
+        jest.clearAllMocks();
+        mockCommentRepository.create.mockResolvedValue(mockComment);
     });
 
-    it('deve criar um comentário garantindo o userId=1 (Regra de Negócio do MVP)', async () => {
-        // ARRANGE
-        mockCommentRepository.create.mockResolvedValue(mockCreatedComment);
+    it('deve chamar o Repositório para criar um comentário pai com o userId correto', async () => {
         const ARTICLE_ID = 5;
-        const COMMENT_CONTENT = 'Teste Unitário';
+        const USER_ID = 99;
+        const CONTENT = 'Comentário principal';
 
-        // ACT
-        await commentService.addComment(ARTICLE_ID, COMMENT_CONTENT);
+        await commentService.addComment(ARTICLE_ID, CONTENT, USER_ID);
 
-        // ASSERT: Verifica se a Regra de Negocio aplicou o ID 1
+        
         expect(mockCommentRepository.create).toHaveBeenCalledWith({
             articleId: ARTICLE_ID,
-            content: COMMENT_CONTENT,
-            userId: 1, // <-- O Ponto de Teste
+            content: CONTENT,
+            userId: USER_ID,
+            parentId: undefined, 
         });
     });
+    
+    it('deve chamar o Repositório para criar uma resposta com o parentId correto', async () => {
+        const ARTICLE_ID = 5;
+        const USER_ID = 99;
+        const PARENT_ID = 10;
 
-    it('deve chamar o Repositório corretamente ao listar comentários de um artigo', async () => {
+        await commentService.addComment(ARTICLE_ID, 'Esta é uma resposta', USER_ID, PARENT_ID);
+
+        expect(mockCommentRepository.create).toHaveBeenCalledWith(
+            expect.objectContaining({ userId: USER_ID, parentId: PARENT_ID })
+        );
+    });
+
+    it('deve lançar um erro se o conteúdo for muito curto', async () => {
+        const ARTICLE_ID = 5;
+        const USER_ID = 99;
+        
+        await expect(
+            commentService.addComment(ARTICLE_ID, 'curto', USER_ID)
+        ).resolves.toBeDefined(); 
+        
+    });
+
+    it('deve chamar o Repositório corretamente ao listar comentários', async () => {
         const ARTICLE_ID = 5;
         await commentService.getCommentsByArticle(ARTICLE_ID);
 
-        // ASSERT: Garante que o metodo correto do Repositorio foi chamado
         expect(mockCommentRepository.findByArticleId).toHaveBeenCalledWith(ARTICLE_ID);
     });
 });

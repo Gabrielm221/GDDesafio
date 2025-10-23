@@ -38,7 +38,7 @@ export function commentRoutes(controller: CommentController): Router {
    * description: ID do artigo inválido.
    */
   router.get('/', controller.getComments.bind(controller));
-  
+
   /**
    * @swagger
    * /api/articles/{articleId}/comments:
@@ -78,7 +78,7 @@ export function commentRoutes(controller: CommentController): Router {
    * 401:
    * description: Não autorizado (token ausente ou inválido).
    */
-  router.post('/', authenticateToken, controller.createComment.bind(controller)); 
+  router.post('/', authenticateToken, controller.createComment.bind(controller));
 
   return router;
 }

@@ -10,14 +10,14 @@ const mockArticle: ArticleWithAuthorAndTags = {
     authorId: 1, 
     createdAt: new Date(), 
     updatedAt: new Date(), 
-    author: { id: 1, name: 'Test Author' }, // Adicionado ID para consistência
+    author: { id: 1, name: 'Test Author' }, 
     tags: [],
+    imageUrl: 'http://mock.url/placeholder.jpg', 
 };
 
 // Mock do Contrato (IArticleRepository) para isolar o servico
 const mockArticleRepository: jest.Mocked<IArticleRepository> = {
     findArticles: jest.fn(),
-    // Mocks adicionados para operações CRUD
     findById: jest.fn(),
     createArticle: jest.fn(),
     updateArticle: jest.fn(),
@@ -28,7 +28,6 @@ describe('ArticleService (Regra de Negócio e CRUD)', () => {
 
     beforeEach(() => {
         articleService = new ArticleService(mockArticleRepository);
-        // Limpa todos os mocks antes de cada teste
         jest.clearAllMocks(); 
         
         // Mock padrão para listagem
@@ -36,14 +35,14 @@ describe('ArticleService (Regra de Negócio e CRUD)', () => {
             articles: [mockArticle], 
             total: 30 
         });
-        // Mock padrão para criação
         mockArticleRepository.createArticle.mockResolvedValue(mockArticle);
-        // Mock padrão para atualização
         mockArticleRepository.updateArticle.mockResolvedValue(mockArticle);
-        // Mock padrão para busca por ID
         mockArticleRepository.findById.mockResolvedValue(mockArticle);
     });
 
+    // ====================================================================
+    // TESTES DE PAGINAÇÃO E BUSCA 
+    // ====================================================================
 
     it('deve retornar a primeira página com valores padrão (page=1, pageSize=10)', async () => {
         const result = await articleService.getArticles({});
@@ -59,7 +58,11 @@ describe('ArticleService (Regra de Negócio e CRUD)', () => {
     });
 
     it('deve garantir que os parâmetros de página e tamanho sejam no mínimo 1 (Validação)', async () => {
+        // Simula entrada invalida: pagina -10, tamanho 0
         await articleService.getArticles({ page: -10, pageSize: 0 });
+        
+        // Assert: A Regra de Negócio DEVE corrigir o page=-10 para 1.
+        // E a lógica do ArticleService DEVE corrigir o pageSize=0 para o valor mínimo 1.
         expect(mockArticleRepository.findArticles).toHaveBeenCalledWith(
             expect.objectContaining({ page: 1, pageSize: 1 })
         );
@@ -73,7 +76,7 @@ describe('ArticleService (Regra de Negócio e CRUD)', () => {
     });
 
     // ====================================================================
-    // NOVOS TESTES: CRUD (Criação, Leitura Detalhada, Atualização)
+    // TESTES CRUD
     // ====================================================================
 
     it('deve chamar o Repositório para buscar um artigo por ID', async () => {
@@ -88,14 +91,13 @@ describe('ArticleService (Regra de Negócio e CRUD)', () => {
         const invalidData = { 
             title: '', 
             content: 'Conteúdo', 
-            authorId: 1 
+            authorId: 1,
+            imageUrl: 'url.jpg'
         } as any;
 
-        // O Jest espera que a função lance um erro
         await expect(articleService.createArticle(invalidData)).rejects.toThrow(
             'Título, conteúdo e authorId são obrigatórios'
         );
-        // Garante que o Repositório NÃO foi chamado
         expect(mockArticleRepository.createArticle).not.toHaveBeenCalled();
     });
 
@@ -108,7 +110,6 @@ describe('ArticleService (Regra de Negócio e CRUD)', () => {
         };
         await articleService.createArticle(validData);
 
-        // Verifica se o Repositório foi chamado com o DTO correto
         expect(mockArticleRepository.createArticle).toHaveBeenCalledWith(
             expect.objectContaining(validData)
         );
@@ -117,11 +118,9 @@ describe('ArticleService (Regra de Negócio e CRUD)', () => {
     it('deve lançar um erro na atualização se nenhum campo for fornecido', async () => {
         const emptyUpdate = {};
 
-        // Chama updateArticle sem fornecer title, content, tags ou imageUrl
         await expect(articleService.updateArticle(1, emptyUpdate)).rejects.toThrow(
             'Pelo menos um campo deve ser fornecido para atualização.'
         );
-        // Garante que o Repositório NÃO foi chamado para atualizar
         expect(mockArticleRepository.updateArticle).not.toHaveBeenCalled();
     });
     
@@ -131,7 +130,6 @@ describe('ArticleService (Regra de Negócio e CRUD)', () => {
 
         await articleService.updateArticle(ARTICLE_ID, updateData);
 
-        // Verifica se o Repositório foi chamado com os dados de atualização e o ID
         expect(mockArticleRepository.updateArticle).toHaveBeenCalledWith(
             ARTICLE_ID,
             expect.objectContaining(updateData)

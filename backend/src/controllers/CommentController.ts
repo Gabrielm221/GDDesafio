@@ -3,7 +3,7 @@ import { CommentService } from '../services/CommentService';
 
 // Tipagem auxiliar para acessar req.user
 interface CustomRequest extends Request {
-    user?: { id: number; name: string; email: string; }; 
+  user?: { id: number; name: string; email: string };
 }
 
 export class CommentController {
@@ -14,16 +14,16 @@ export class CommentController {
   }
 
   public async createComment(req: Request, res: Response): Promise<Response> {
-    const authenticatedReq = req as CustomRequest; 
-    
+    const authenticatedReq = req as CustomRequest;
+
     try {
       const articleId = parseInt(req.params.articleId);
       const { content, parentId } = req.body; // NOVO: Recebe parentId (opcional)
-      const userId = authenticatedReq.user?.id; 
+      const userId = authenticatedReq.user?.id;
 
       // 1. Validação de segurança
       if (!userId) {
-          return res.status(401).json({ message: 'Autenticação necessária.' });
+        return res.status(401).json({ message: 'Autenticação necessária.' });
       }
 
       // 2. Validação de entrada
@@ -31,15 +31,17 @@ export class CommentController {
         return res.status(400).json({ message: 'ID do artigo inválido.' });
       }
       if (!content || content.trim().length < 5) {
-        return res.status(400).json({ message: 'Conteúdo do comentário deve ter no mínimo 5 caracteres.' });
+        return res
+          .status(400)
+          .json({ message: 'Conteúdo do comentário deve ter no mínimo 5 caracteres.' });
       }
 
       //CHAMA O SERVIÇO PASSANDO O userId E parentId
       const newComment = await this.commentService.addComment(
-          articleId, 
-          content.trim(), 
-          userId, 
-          parentId ? parseInt(parentId) : undefined // Converte parentId para number se existir
+        articleId,
+        content.trim(),
+        userId,
+        parentId ? parseInt(parentId) : undefined // Converte parentId para number se existir
       );
 
       return res.status(201).json(newComment);
@@ -48,7 +50,7 @@ export class CommentController {
     }
   }
 
-   public async getComments(req: Request, res: Response): Promise<Response> {
+  public async getComments(req: Request, res: Response): Promise<Response> {
     try {
       const articleId = parseInt(req.params.articleId);
       if (isNaN(articleId) || articleId <= 0) {

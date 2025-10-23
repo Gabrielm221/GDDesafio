@@ -4,7 +4,10 @@ import { CommentController } from '../controllers/CommentController';
 import { commentRoutes } from './CommentRoutes';
 import { authenticateToken } from '../middlewares/authMiddlewares'; // Middleware de Autenticação
 
-export function articleRoutes(articleController: ArticleController, commentController: CommentController): Router {
+export function articleRoutes(
+  articleController: ArticleController,
+  commentController: CommentController
+): Router {
   const router = Router();
 
   /**
@@ -44,7 +47,7 @@ export function articleRoutes(articleController: ArticleController, commentContr
    * description: Erro interno do servidor.
    */
   router.get('/', articleController.getArticles.bind(articleController));
-  
+
   /**
    * @swagger
    * /api/articles/{id}:
@@ -64,7 +67,7 @@ export function articleRoutes(articleController: ArticleController, commentContr
    * description: Artigo não encontrado.
    */
   router.get('/:id', articleController.getArticleById.bind(articleController));
-  
+
   /**
    * @swagger
    * /api/articles:
@@ -91,7 +94,7 @@ export function articleRoutes(articleController: ArticleController, commentContr
    * 401: { description: Não autorizado (Token ausente ou inválido). }
    */
   router.post('/', authenticateToken, articleController.createArticle.bind(articleController));
-  
+
   /**
    * @swagger
    * /api/articles/{id}:

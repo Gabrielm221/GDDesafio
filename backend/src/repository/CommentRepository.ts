@@ -1,18 +1,20 @@
 import { PrismaClient, Comment, Prisma } from '@prisma/client';
-import { ICommentRepository } from '../types/CommentInterface'; 
+import { ICommentRepository } from '../types/CommentInterface';
 
-export type CommentCreateInput = Omit<Prisma.CommentCreateInput, 'user' | 'article' | 'parent' | 'replies'> & {
+export type CommentCreateInput = Omit<
+  Prisma.CommentCreateInput,
+  'user' | 'article' | 'parent' | 'replies'
+> & {
   userId: number;
   articleId: number;
-  parentId?: number; 
+  parentId?: number;
 };
 export type CommentWithAuthorAndReplies = Prisma.CommentGetPayload<{
-  include: { 
-    user: { select: { id: true, name: true } },
-    replies: { include: { user: { select: { id: true, name: true } } } }
+  include: {
+    user: { select: { id: true; name: true } };
+    replies: { include: { user: { select: { id: true; name: true } } } };
   };
 }>;
-
 
 export class CommentRepository implements ICommentRepository {
   constructor(private prisma: PrismaClient) {}
@@ -23,25 +25,25 @@ export class CommentRepository implements ICommentRepository {
         content: data.content,
         userId: data.userId,
         articleId: data.articleId,
-        parentId: data.parentId, 
+        parentId: data.parentId,
       },
-      // 
+      //
     });
   }
 
   public async findByArticleId(articleId: number): Promise<CommentWithAuthorAndReplies[]> {
     return this.prisma.comment.findMany({
-      where: { 
+      where: {
         articleId,
         parentId: null, // Busca apenas comentários pais
       },
-      
-      include: { 
-        user: { select: { id: true, name: true } }, 
-        replies: { 
-            include: { user: { select: { id: true, name: true } } },
-            orderBy: { createdAt: 'asc' }
-        }
+
+      include: {
+        user: { select: { id: true, name: true } },
+        replies: {
+          include: { user: { select: { id: true, name: true } } },
+          orderBy: { createdAt: 'asc' },
+        },
       },
       orderBy: { createdAt: 'asc' },
     });

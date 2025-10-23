@@ -27,7 +27,12 @@ export class ArticleService {
 
     return {
       data: articles,
-      meta: { totalItems: total, pageSize, currentPage: page, totalPages: Math.ceil(total / pageSize) },
+      meta: {
+        totalItems: total,
+        pageSize,
+        currentPage: page,
+        totalPages: Math.ceil(total / pageSize),
+      },
     };
   }
 
@@ -54,8 +59,7 @@ export class ArticleService {
     if (!data.title && !data.content && !data.tags && !data.imageUrl)
       throw new Error('Pelo menos um campo deve ser fornecido para atualização.');
 
-    if (data.title && data.title.trim().length === 0)
-      throw new Error('Título não pode ser vazio.');
+    if (data.title && data.title.trim().length === 0) throw new Error('Título não pode ser vazio.');
 
     return this.repository.updateArticle(id, data);
   }

@@ -1,12 +1,12 @@
-import { PrismaClient, Prisma, User } from "@prisma/client";
-import { IUserUpdate } from "../types/UserInterface"; // Interface necessária
+import { PrismaClient, Prisma, User } from '@prisma/client';
+import { IUserUpdate } from '../types/UserInterface'; // Interface necessária
 
 export class UserRepository {
   constructor(private prisma: PrismaClient) {} // Injeção
 
   async create(dados: Prisma.UserCreateInput): Promise<User> {
-    return this.prisma.user.create({ 
-      data: dados, 
+    return this.prisma.user.create({
+      data: dados,
     });
   }
 
@@ -19,11 +19,11 @@ export class UserRepository {
   }
 
   async searchById(id: number): Promise<User | null> {
-    return this.prisma.user.findUnique({ where: { id } }); 
+    return this.prisma.user.findUnique({ where: { id } });
   }
-  
+
   async update(userId: number, dados: IUserUpdate): Promise<User> {
-    return this.prisma.user.update({ 
+    return this.prisma.user.update({
       where: { id: userId },
       data: dados,
     });

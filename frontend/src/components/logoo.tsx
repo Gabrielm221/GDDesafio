@@ -1,7 +1,7 @@
 import React from "react";
 import logo1 from "../assets/icons/image1.png";
-import logo2 from "../assets/icons/image2.png";
-import logo3 from "../assets/icons/image3.png";
+import logo2 from "../assets/icons/image1.png";
+import logo3 from "../assets/icons/image1.png";
 
 type LogoProps = {
   size?: number;

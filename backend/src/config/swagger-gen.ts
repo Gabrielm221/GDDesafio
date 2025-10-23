@@ -18,7 +18,7 @@ const doc = {
   security: [{ bearerAuth: [] }],
 };
 
-const outputFile = '../../swagger-output.json'; 
+const outputFile = '../../swagger-output.json';
 const endpointsFiles = ['./src/server.ts'];
 
 swaggerAutogen({ openapi: '3.0.0' })(outputFile, endpointsFiles, doc);

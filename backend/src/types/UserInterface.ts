@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { User } from '@prisma/client';
 
 export interface IUserUpdate {
   name?: string;
@@ -13,5 +13,5 @@ export interface IUserRepository {
   searchByEmail: (email: string) => Promise<User | null>;
   searchById: (id: number) => Promise<User | null>;
   // Tipagem correta usando o DTO do mesmo arquivo
-  update: (userId: number, dados: IUserUpdate) => Promise<User>; 
+  update: (userId: number, dados: IUserUpdate) => Promise<User>;
 }
