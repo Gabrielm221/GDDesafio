@@ -1,52 +1,47 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { Article } from '../types';
 import TagPill from './TagPill';
 import { formatDate } from '../utils/format';
 import { useAuth } from '../hooks/useAuth'; 
 
 const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
-  const { user } = useAuth(); 
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const loggedUserId = user?.id;
   const articleAuthorId = article.author?.id;
-  
-  // LOGICA DA PROPRIEDADE
-  const isOwner = 
-    !!user && 
-    !!articleAuthorId && 
-    (Number(articleAuthorId) === loggedUserId);
 
-  // AQUI PRA NAO FICAR VAZIO, USAMOS A LOGICA : USA O LINK QUE COLOCAMOS OU O PLACEHOLDER DA IMAGEM
+  // Verifica se o artigo pertence ao usuário logado
+  const isOwner = !!user && !!articleAuthorId && (Number(articleAuthorId) === loggedUserId);
+
+  // Define imagem principal ou placeholder
   const primaryTag = article.tags[0]?.tag.name || "Geral";
   const placeholderUrl = `https://placehold.co/80x80/E0E0E0/707070?text=${primaryTag.substring(0, 3)}`;
-
   const imageSource = article.imageUrl || placeholderUrl;
 
   const detailPath = `/article/${article.id}`;
   const editPath = `/article/edit/${article.id}`;
 
-
   return (
-    // Link principal
-    <Link to={detailPath} className="block"> 
-      <div className="flex items-start gap-4 py-4 border-b hover:bg-gray-50 transition">
+    <div className="flex items-start gap-4 py-4 border-b hover:bg-gray-50 transition">
+      {/* Card inteiro clicável */}
+      <Link to={detailPath} className="flex-1 flex items-start gap-4">
         
-        {/* RENDERIZACAO DA IMAGEM */}
+        {/* Imagem */}
         <div className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gradient-to-tr from-[#efe9e0] to-[#e7e0d6]">
-            <img
-                // USA A URL PARA O PLACEHOLDER
-                src={imageSource} 
-                alt={article.title}
-                className="w-full h-full object-cover" // OCUPA TODO DIV
-                onError={(e) => {
-                    // FALLBACK PARA A URL SIMPLES SE O PLACEHOLDER FALHAR
-                    e.currentTarget.src = placeholderUrl; 
-                    e.currentTarget.className = "w-full h-full object-center p-2"; // AJUSTA O PADDING DO FALLBACK
-                }}
-            />
+          <img
+            src={imageSource}
+            alt={article.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = placeholderUrl;
+              e.currentTarget.className = "w-full h-full object-center p-2";
+            }}
+          />
         </div>
 
+        {/* Texto */}
         <div className="flex-1">
           <div className="flex items-start justify-between">
             <div>
@@ -54,19 +49,6 @@ const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
               <div className="text-textSecondary text-xs mt-1">
                 {article.author?.name} • {formatDate(article.createdAt)}
               </div>
-            </div>
-
-            <div className="ml-4">
-              {/* RRENDERIZACAO CONDICIONAL */}
-              {isOwner && (
-                <Link
-                  to={editPath} 
-                  onClick={e => e.stopPropagation()} 
-                  className="inline-flex items-center justify-center w-8 h-8 rounded border text-textSecondary hover:bg-gray-100"
-                >
-                  ✎
-                </Link>
-              )}
             </div>
           </div>
 
@@ -84,9 +66,23 @@ const ArticleCard: React.FC<{ article: Article }> = ({ article }) => {
             </div>
           )}
         </div>
-      </div>
-    </Link>
-  )
-}
+      </Link>
+
+      {/* Botão de edição (fora do link principal) */}
+      {isOwner && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // evita abrir o link do artigo
+            navigate(editPath);  // navega pro editor
+          }}
+          className="inline-flex items-center justify-center w-8 h-8 rounded border text-textSecondary hover:bg-gray-100"
+          title="Editar artigo"
+        >
+          ✎
+        </button>
+      )}
+    </div>
+  );
+};
 
 export default ArticleCard;
