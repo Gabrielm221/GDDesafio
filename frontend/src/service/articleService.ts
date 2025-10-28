@@ -1,7 +1,5 @@
 import api from './api';
-import type { PaginatedArticles, Article, IArticleForm } from '../types'; // Assumindo que IArticleForm e Article estão em '../types'
-
-const DEFAULT_PAGE_SIZE = 5;
+import type { PaginatedArticles, Article, IArticleForm } from '../types'; 
 
 
 // RETORNAMOS UMA ESTRUTURA PADRÃO DE PAGINAÇÃO
