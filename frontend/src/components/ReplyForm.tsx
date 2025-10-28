@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import { UseMutationResult } from '@tanstack/react-query';
 
-const BG_INPUT_COLOR = '#f0f6ec'; 
-const BTN_COLOR_GREEN = '#6B9042'; 
-
 interface ReplyFormProps {
     articleId: string;
     parentId: number; // O ID do comentário pai
