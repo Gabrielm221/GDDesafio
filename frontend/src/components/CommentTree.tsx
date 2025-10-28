@@ -1,18 +1,29 @@
+// CommentTree.tsx
 import React from 'react';
 import { formatDate } from '../utils/format'; 
 import { ReplyForm } from './ReplyForm';
 import { UseMutationResult } from '@tanstack/react-query';
 
-// AUXILIARES
-type CommentWithReplies = any; 
+// TIPAGEM DO COMENTÁRIO 
+export interface CommentWithReplies {
+  id: number;
+  content: string;
+  createdAt: string;
+  user: {
+    id?: number;
+    name: string;
+  };
+  replies?: CommentWithReplies[]; // recursivo
+}
 
+// PROPS DO COMPONENTE
 interface CommentTreeProps {
     comment: CommentWithReplies;
     level: number;
 
     onReplyToggle: (id: number) => void;
     currentReplyingId: number | null;
-    // PAYLOAD FLEXIVEL
+    // PAYLOAD 
     mutation: UseMutationResult<any, Error, { content: string, parentId?: number }, unknown>; 
     articleId: string;
     onCancelReply: () => void;
@@ -68,7 +79,7 @@ const CommentTree: React.FC<CommentTreeProps> = ({
             )}
 
             {/* RENDERIZACAO RECURSIVA DAS RESPOSTAS */}
-            {comment.replies && comment.replies.map((reply) => (
+            {comment.replies && comment.replies.map((reply: CommentWithReplies) => (
                 <CommentTree
                     key={reply.id}
                     comment={reply}

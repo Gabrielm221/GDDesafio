@@ -9,7 +9,7 @@ export type ArticleWithAuthorAndTags = Prisma.ArticleGetPayload<{
 }>;
 
 export class ArticleRepository implements IArticleRepository {
-  constructor(private prisma: PrismaClient) { }
+  constructor(private prisma: PrismaClient) {}
 
   public async findArticles({
     page,
@@ -69,7 +69,6 @@ export class ArticleRepository implements IArticleRepository {
     return { articles, total };
   }
 
-
   public async findById(id: number): Promise<ArticleWithAuthorAndTags | null> {
     return this.prisma.article.findUnique({
       where: { id },
@@ -87,7 +86,7 @@ export class ArticleRepository implements IArticleRepository {
     authorId: number;
     tags?: string[];
   }): Promise<ArticleWithAuthorAndTags> {
-    const tagConnectOrCreate = data.tags?.map(tagName => ({
+    const tagConnectOrCreate = data.tags?.map((tagName) => ({
       tag: { connectOrCreate: { where: { name: tagName }, create: { name: tagName } } },
     }));
 
@@ -124,7 +123,7 @@ export class ArticleRepository implements IArticleRepository {
       await this.prisma.articleOnTag.deleteMany({ where: { articleId: id } });
     }
 
-    const tagConnectOrCreate = data.tags?.map(tagName => ({
+    const tagConnectOrCreate = data.tags?.map((tagName) => ({
       tag: { connectOrCreate: { where: { name: tagName }, create: { name: tagName } } },
     }));
 
